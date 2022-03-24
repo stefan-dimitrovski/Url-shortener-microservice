@@ -25,12 +25,12 @@ class ShortUrlService(private val shortUrlRepository: ShortUrlRepository) {
         }
 
     fun saveUrl(url: String): ShortUrl? =
-        if (tryParseUrl(url)) {
+        if (validateUrl(url)) {
             logger.info("Saving url [{}]", url)
             shortUrlRepository.save(ShortUrl(original_url = url))
         } else null
 
-    fun tryParseUrl(url: String): Boolean =
+    fun validateUrl(url: String): Boolean =
         try {
             URL(url).toURI()
             true
