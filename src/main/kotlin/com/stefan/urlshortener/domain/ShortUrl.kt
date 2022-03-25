@@ -7,7 +7,8 @@ import javax.persistence.*
 data class ShortUrl(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val short_url: Long? = null,
-    @Column
-    val original_url: String,
+    @Column(name = "short_url")
+    val shortUrl: Long? = null,
+    @Column(name = "original_url")
+    val originalUrl: String,
 )

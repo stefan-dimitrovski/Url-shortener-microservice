@@ -12,11 +12,11 @@ class ShortUrlService(private val shortUrlRepository: ShortUrlRepository) {
 
     val logger: Logger = LoggerFactory.getLogger(ShortUrlService::class.java)
 
-    fun getOriginalUrl(shortUrl: String): UrlResult =
-        when (shortUrl.toLongOrNull()) {
+    fun getOriginalUrl(url: String): UrlResult =
+        when (url.toLongOrNull()) {
             is Long -> {
                 try {
-                    UrlFound(shortUrlRepository.getById(shortUrl.toLong()).original_url)
+                    UrlFound(shortUrlRepository.getById(url.toLong()).originalUrl)
                 } catch (e: Exception) {
                     UrlNotFound
                 }
@@ -24,11 +24,18 @@ class ShortUrlService(private val shortUrlRepository: ShortUrlRepository) {
             else -> InvalidUrl
         }
 
-    fun saveUrl(url: String): ShortUrl? =
-        if (validateUrl(url)) {
-            logger.info("Saving url [{}]", url)
-            shortUrlRepository.save(ShortUrl(original_url = url))
-        } else null
+    fun saveUrl(url: String): ShortUrl? {
+        return if (validateUrl(url)) {
+            val shortUrl = shortUrlRepository.findByOriginalUrl(url)
+            if (shortUrl == null) {
+                logger.info("Saving url [{}]", url)
+                shortUrlRepository.save(ShortUrl(originalUrl = url))
+            } else {
+                shortUrl
+            }
+        } else
+            null
+    }
 
     fun validateUrl(url: String): Boolean =
         try {
